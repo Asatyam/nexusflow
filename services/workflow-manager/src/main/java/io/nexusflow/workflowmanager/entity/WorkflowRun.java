@@ -2,7 +2,6 @@ package io.nexusflow.workflowmanager.entity;
 
 import io.nexusflow.workflowmanager.enums.WorkflowRunStatusEnum;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +12,7 @@ public class WorkflowRun {
     @GeneratedValue
     private Long id;
     @ManyToOne
-    private WorkflowDefinition workflowDefinitionId;
+    private WorkflowDefinition workflowDefinition;
 
     private WorkflowRunStatusEnum status;
 
@@ -38,12 +37,12 @@ public class WorkflowRun {
         this.id = id;
     }
 
-    public WorkflowDefinition getWorkflowDefinitionId() {
-        return workflowDefinitionId;
+    public WorkflowDefinition getWorkflowDefinition() {
+        return workflowDefinition;
     }
 
-    public void setWorkflowDefinitionId(WorkflowDefinition workflowDefinitionId) {
-        this.workflowDefinitionId = workflowDefinitionId;
+    public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
+        this.workflowDefinition = workflowDefinition;
     }
 
     public WorkflowRunStatusEnum getStatus() {
@@ -98,7 +97,7 @@ public class WorkflowRun {
     public String toString() {
         return "WorkflowRun{" +
                 "id=" + id +
-                ", workflowDefinitionId=" + workflowDefinitionId +
+                ", workflowDefinitionId=" + workflowDefinition +
                 ", status=" + status +
                 ", inputData='" + inputData + '\'' +
                 ", outputData='" + outputData + '\'' +

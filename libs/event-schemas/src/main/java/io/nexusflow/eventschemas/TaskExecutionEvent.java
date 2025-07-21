@@ -4,17 +4,15 @@ public class TaskExecutionEvent {
 
     private Long taskRunId;
     private Long workflowRunId;
-    private String status;
-    private String message;
+    private String taskName;
 
     public TaskExecutionEvent() {
     }
 
-    public TaskExecutionEvent(Long taskRunId, Long workflowRunId, String status, String message) {
+    public TaskExecutionEvent(Long taskRunId, Long workflowRunId, String taskName) {
         this.taskRunId = taskRunId;
         this.workflowRunId = workflowRunId;
-        this.status = status;
-        this.message = message;
+        this.taskName = taskName;
     }
 
     public Long getTaskRunId() {
@@ -33,20 +31,12 @@ public class TaskExecutionEvent {
         this.workflowRunId = workflowRunId;
     }
 
-    public String getStatus() {
-        return status;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     @Override
@@ -54,8 +44,7 @@ public class TaskExecutionEvent {
         return "TaskExecutionEvent{" +
                 "taskRunId=" + taskRunId +
                 ", workflowRunId=" + workflowRunId +
-                ", status='" + status + '\'' +
-                ", message='" + message + '\'' +
+                ", taskName='" + taskName + '\'' +
                 '}';
     }
 }

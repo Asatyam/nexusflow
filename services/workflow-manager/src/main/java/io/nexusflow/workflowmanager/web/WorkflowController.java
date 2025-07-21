@@ -1,12 +1,10 @@
 package io.nexusflow.workflowmanager.web;
 
 import io.nexusflow.workflowmanager.entity.WorkflowDefinition;
+import io.nexusflow.workflowmanager.entity.WorkflowRun;
 import io.nexusflow.workflowmanager.service.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/workflows")
@@ -25,5 +23,11 @@ public class WorkflowController {
                 workflowDefinition.getDescription(),
                 workflowDefinition.getDefinition()
         );
+    }
+
+    @PostMapping("/run/{id}")
+    public WorkflowRun runWorkflow(@PathVariable("id") String workflowRunId) {
+        Long id = Long.parseLong(workflowRunId);
+        return workflowService.runWorkflow(id);
     }
 }
