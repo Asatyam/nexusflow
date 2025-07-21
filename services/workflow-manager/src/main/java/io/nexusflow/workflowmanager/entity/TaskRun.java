@@ -1,0 +1,129 @@
+package io.nexusflow.workflowmanager.entity;
+
+import io.nexusflow.workflowmanager.enums.TaskRunStatusEnum;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+public class TaskRun {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "workflow_run_id", nullable = false)
+    private WorkflowRun workflowRun;
+
+    private String taskName;
+    private TaskRunStatusEnum status;
+    private Integer retries;
+    private String logUrl;
+    private String artifactUrl;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    public TaskRun() {
+    }
+
+    public TaskRun(Long id, WorkflowRun workflowRun, String taskName, TaskRunStatusEnum status, Integer retries, String logUrl, String artifactUrl, LocalDateTime startTime, LocalDateTime endTime) {
+        this.id = id;
+        this.workflowRun = workflowRun;
+        this.taskName = taskName;
+        this.status = status;
+        this.retries = retries;
+        this.logUrl = logUrl;
+        this.artifactUrl = artifactUrl;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public WorkflowRun getWorkflowRun() {
+        return workflowRun;
+    }
+
+    public void setWorkflowRun(WorkflowRun workflowRun) {
+        this.workflowRun = workflowRun;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public TaskRunStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskRunStatusEnum status) {
+        this.status = status;
+    }
+
+    public Integer getRetries() {
+        return retries;
+    }
+
+    public void setRetries(Integer retries) {
+        this.retries = retries;
+    }
+
+    public String getLogUrl() {
+        return logUrl;
+    }
+
+    public void setLogUrl(String logUrl) {
+        this.logUrl = logUrl;
+    }
+
+    public String getArtifactUrl() {
+        return artifactUrl;
+    }
+
+    public void setArtifactUrl(String artifactUrl) {
+        this.artifactUrl = artifactUrl;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskRun{" +
+                "id=" + id +
+                ", workflowRun=" + workflowRun +
+                ", taskName='" + taskName + '\'' +
+                ", status=" + status +
+                ", retries=" + retries +
+                ", logUrl='" + logUrl + '\'' +
+                ", artifactUrl='" + artifactUrl + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
+    }
+}

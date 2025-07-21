@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class WorkflowRun {
@@ -22,4 +23,88 @@ public class WorkflowRun {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
+    @OneToMany(mappedBy = "workflowRun", cascade = CascadeType.ALL)
+    private List<TaskRun> taskRuns;
+
+    public WorkflowRun() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public WorkflowDefinition getWorkflowDefinitionId() {
+        return workflowDefinitionId;
+    }
+
+    public void setWorkflowDefinitionId(WorkflowDefinition workflowDefinitionId) {
+        this.workflowDefinitionId = workflowDefinitionId;
+    }
+
+    public WorkflowRunStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(WorkflowRunStatusEnum status) {
+        this.status = status;
+    }
+
+    public String getInputData() {
+        return inputData;
+    }
+
+    public void setInputData(String inputData) {
+        this.inputData = inputData;
+    }
+
+    public String getOutputData() {
+        return outputData;
+    }
+
+    public void setOutputData(String outputData) {
+        this.outputData = outputData;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public List<TaskRun> getTaskRuns() {
+        return taskRuns;
+    }
+
+    public void setTaskRuns(List<TaskRun> taskRuns) {
+        this.taskRuns = taskRuns;
+    }
+
+    @Override
+    public String toString() {
+        return "WorkflowRun{" +
+                "id=" + id +
+                ", workflowDefinitionId=" + workflowDefinitionId +
+                ", status=" + status +
+                ", inputData='" + inputData + '\'' +
+                ", outputData='" + outputData + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", taskRuns=" + taskRuns +
+                '}';
+    }
 }
