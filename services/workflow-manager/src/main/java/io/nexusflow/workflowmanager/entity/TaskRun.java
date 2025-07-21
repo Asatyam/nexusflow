@@ -19,7 +19,7 @@ public class TaskRun {
     private String taskName;
     private TaskRunStatusEnum status;
     private Integer retries;
-    private String logUrl;
+    private String logsUrl;
     private String artifactUrl;
 
     private LocalDateTime startTime;
@@ -34,7 +34,7 @@ public class TaskRun {
         this.taskName = taskName;
         this.status = status;
         this.retries = retries;
-        this.logUrl = logUrl;
+        this.logsUrl = logUrl;
         this.artifactUrl = artifactUrl;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -80,12 +80,12 @@ public class TaskRun {
         this.retries = retries;
     }
 
-    public String getLogUrl() {
-        return logUrl;
+    public String getLogsUrl() {
+        return logsUrl;
     }
 
-    public void setLogUrl(String logUrl) {
-        this.logUrl = logUrl;
+    public void setLogsUrl(String logUrl) {
+        this.logsUrl = logUrl;
     }
 
     public String getArtifactUrl() {
@@ -120,7 +120,7 @@ public class TaskRun {
                 ", taskName='" + taskName + '\'' +
                 ", status=" + status +
                 ", retries=" + retries +
-                ", logUrl='" + logUrl + '\'' +
+                ", logUrl='" + logsUrl + '\'' +
                 ", artifactUrl='" + artifactUrl + '\'' +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
