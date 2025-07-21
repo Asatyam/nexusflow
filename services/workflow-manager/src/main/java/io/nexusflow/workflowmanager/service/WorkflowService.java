@@ -55,8 +55,8 @@ public class WorkflowService {
         taskRun.setTaskName("initial-task");
         taskRun.setStatus(TaskRunStatusEnum.PENDING);
 
-
-        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskRun.getId(),workflowRunSaved.getId(), taskRun.getTaskName() );
+        TaskRun taskRunSaved = taskRunRepository.save(taskRun);
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskRunSaved.getId(),workflowRunSaved.getId(), taskRunSaved.getTaskName() );
         kafkaTemplate.send("tasks.execute", workflowRunSaved.getId().toString(), taskExecutionEvent);
 
         return workflowRunSaved;
