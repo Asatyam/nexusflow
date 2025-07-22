@@ -17,7 +17,7 @@ public class TaskRun {
     private WorkflowRun workflowRun;
 
     private String taskName;
-    private TaskRunStatusEnum status;
+    private String status;
     private Integer retries;
     private String logsUrl;
     private String artifactUrl;
@@ -28,7 +28,7 @@ public class TaskRun {
     public TaskRun() {
     }
 
-    public TaskRun(Long id, WorkflowRun workflowRun, String taskName, TaskRunStatusEnum status, Integer retries, String logUrl, String artifactUrl, LocalDateTime startTime, LocalDateTime endTime) {
+    public TaskRun(Long id, WorkflowRun workflowRun, String taskName, String status, Integer retries, String logUrl, String artifactUrl, LocalDateTime startTime, LocalDateTime endTime) {
         this.id = id;
         this.workflowRun = workflowRun;
         this.taskName = taskName;
@@ -64,11 +64,11 @@ public class TaskRun {
         this.taskName = taskName;
     }
 
-    public TaskRunStatusEnum getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(TaskRunStatusEnum status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

@@ -14,7 +14,7 @@ public class WorkflowRun {
     @ManyToOne
     private WorkflowDefinition workflowDefinition;
 
-    private WorkflowRunStatusEnum status;
+    private String status;
 
     @Column(columnDefinition = "TEXT")
     private String inputData;
@@ -45,11 +45,11 @@ public class WorkflowRun {
         this.workflowDefinition = workflowDefinition;
     }
 
-    public WorkflowRunStatusEnum getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(WorkflowRunStatusEnum status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
