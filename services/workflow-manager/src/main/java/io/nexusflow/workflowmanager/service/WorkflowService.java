@@ -45,7 +45,7 @@ public class WorkflowService {
                 .orElseThrow(() -> new RuntimeException("WorkflowDefinition not found"));
         WorkflowRun workflowRun = new WorkflowRun();
         workflowRun.setWorkflowDefinition(workflowDefinition);
-        workflowRun.setStatus(WorkflowRunStatusEnum.RUNNING);
+        workflowRun.setStatus("RUNNING");
         workflowRun.setStartTime(LocalDateTime.now());
         WorkflowRun workflowRunSaved = workflowRunRepository.save(workflowRun);
 
@@ -53,7 +53,8 @@ public class WorkflowService {
         taskRun.setWorkflowRun(workflowRunSaved);
         //TODO: Parse task name from workflow definition
         taskRun.setTaskName("initial-task");
-        taskRun.setStatus(TaskRunStatusEnum.PENDING);
+        taskRun.setStatus("PENDING");
+        taskRun.setStartTime(LocalDateTime.now());
 
         TaskRun taskRunSaved = taskRunRepository.save(taskRun);
         TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskRunSaved.getId(),workflowRunSaved.getId(), taskRunSaved.getTaskName() );
