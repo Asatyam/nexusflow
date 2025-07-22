@@ -10,7 +10,7 @@ public class TestTopicListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TestTopicListener.class);
 
-    @KafkaListener(topics= "tasks.execute")
+    @KafkaListener(topics= "test-topic")
     public void listen(String message) {
         logger.info("Received message: {}", message);
     }
