@@ -2,19 +2,43 @@ package io.nexusflow.taskrunner.handler;
 
 import io.nexusflow.eventschemas.TaskCompletionEvent;
 import io.nexusflow.eventschemas.TaskExecutionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FailureTaskHandler implements TaskHandler {
+    private static final String TASK_NAME = "failure-task";
+    private static final Logger LOGGER = LoggerFactory.getLogger(FailureTaskHandler.class);
+
     @Override
     public String getTaskName() {
-        return "FailureTaskHandler";
+        return TASK_NAME;
     }
 
     @Override
     public TaskCompletionEvent execute(TaskExecutionEvent event) {
-        TaskCompletionEvent completionEvent = new TaskCompletionEvent();
-        completionEvent.setTaskRunId(event.getTaskRunId());
-        completionEvent.setStatus("FAILURE");
-        completionEvent.setMessage("Task execution failed.");
-        return completionEvent;
+
+        LOGGER.info("Running a failed task: {}", event.getTaskName());
+
+        TaskCompletionEvent taskCompletionEvent = new TaskCompletionEvent();
+        taskCompletionEvent.setTaskRunId(event.getTaskRunId());
+        taskCompletionEvent.setWorkflowRunId(event.getWorkflowRunId());
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.error("Task execution interrupted: {}", e.getMessage());
+            taskCompletionEvent.setStatus("FAILURE");
+            taskCompletionEvent.setMessage("Task execution was interrupted.");
+            return taskCompletionEvent;
+        }
+        LOGGER.info("Task {} failed", event.getTaskName());
+
+        taskCompletionEvent.setStatus("FAILURE");
+        taskCompletionEvent.setMessage("Task failed to execute.");
+
+        return taskCompletionEvent;
     }
 }
