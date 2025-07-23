@@ -1,11 +1,10 @@
 package io.nexusflow.workflowmanager.service;
 
 import io.nexusflow.eventschemas.TaskExecutionEvent;
+import io.nexusflow.workflowmanager.domain.WorkflowGraph;
 import io.nexusflow.workflowmanager.entity.TaskRun;
 import io.nexusflow.workflowmanager.entity.WorkflowDefinition;
 import io.nexusflow.workflowmanager.entity.WorkflowRun;
-import io.nexusflow.workflowmanager.enums.TaskRunStatusEnum;
-import io.nexusflow.workflowmanager.enums.WorkflowRunStatusEnum;
 import io.nexusflow.workflowmanager.repositories.TaskRunRepository;
 import io.nexusflow.workflowmanager.repositories.WorkflowDefinitionRepository;
 import io.nexusflow.workflowmanager.repositories.WorkflowRunRepository;
@@ -22,14 +21,19 @@ public class WorkflowService {
     private final WorkflowRunRepository workflowRunRepository;
     private final TaskRunRepository taskRunRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final WorkflowDefinitionParser workflowDefinitionParser;
+
 
     @Autowired
-    public WorkflowService(WorkflowDefinitionRepository workflowDefinitionRepository, WorkflowRunRepository workflowRunRepository, TaskRunRepository taskRunRepository, KafkaTemplate<String, Object> kafkaTemplate) {
+    public WorkflowService(WorkflowDefinitionRepository workflowDefinitionRepository, WorkflowRunRepository workflowRunRepository, TaskRunRepository taskRunRepository, KafkaTemplate<String, Object> kafkaTemplate, WorkflowDefinitionParser workflowDefinitionParser) {
         this.workflowDefinitionRepository = workflowDefinitionRepository;
         this.workflowRunRepository = workflowRunRepository;
         this.taskRunRepository = taskRunRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.workflowDefinitionParser = workflowDefinitionParser;
     }
+
+
 
     public WorkflowDefinition createWorkflow(String name,String description, String definition) {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
@@ -40,9 +44,14 @@ public class WorkflowService {
         workflowDefinition.setEnabled(true);
         return workflowDefinitionRepository.save(workflowDefinition);
     }
+
     public WorkflowRun runWorkflow(Long WorkflowDefinitionId) {
         WorkflowDefinition workflowDefinition = workflowDefinitionRepository.findById(WorkflowDefinitionId)
                 .orElseThrow(() -> new RuntimeException("WorkflowDefinition not found"));
+
+        WorkflowGraph workflowGraph = workflowDefinitionParser.buildWorkflowGraph(workflowDefinition);
+        System.out.println("Workflow Graph: " + workflowGraph);
+
         WorkflowRun workflowRun = new WorkflowRun();
         workflowRun.setWorkflowDefinition(workflowDefinition);
         workflowRun.setStatus("RUNNING");
