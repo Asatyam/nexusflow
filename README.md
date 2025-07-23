@@ -32,8 +32,6 @@
 
 [x] Successfully established the first end-to-end workflow loop (API call -> manager publishes event -> runner consumes event).
 
-[ ] Enhance Core Workflow Logic
-
 [x] Implement DAG (Directed Acyclic Graph) parsing from the WorkflowDefinition's JSON to handle multi-step workflows with complex dependencies.
 
 [ ] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
