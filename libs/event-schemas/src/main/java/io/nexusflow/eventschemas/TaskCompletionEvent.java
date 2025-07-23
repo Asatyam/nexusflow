@@ -66,4 +66,16 @@ public class TaskCompletionEvent {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "TaskCompletionEvent{" +
+                "taskRunId=" + taskRunId +
+                ", workflowRunId=" + workflowRunId +
+                ", status='" + status + '\'' +
+                ", logsUrl='" + logsUrl + '\'' +
+                ", artifactUrl='" + artifactUrl + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }
