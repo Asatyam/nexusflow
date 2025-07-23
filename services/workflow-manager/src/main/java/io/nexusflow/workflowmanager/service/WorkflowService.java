@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
+
 
 @Service
 public class WorkflowService {
@@ -49,6 +49,9 @@ public class WorkflowService {
         workflowDefinition.setDescription(description);
         workflowDefinition.setVersion(1);
         workflowDefinition.setEnabled(true);
+
+        workflowDefinitionParser.detectCycle(workflowDefinition);
+
         return workflowDefinitionRepository.save(workflowDefinition);
     }
     
@@ -72,8 +75,10 @@ public class WorkflowService {
                 taskExecutionEvent.setTaskRunId(taskRun.getId());
                 taskExecutionEvent.setWorkflowRunId(workflowRunSaved.getId());
                 taskExecutionEvent.setTaskName(taskRun.getTaskName());
-                kafkaTemplate.send("tasks.execute", workflowRunSaved.getId().toString(), taskExecutionEvent);
                 taskRun.setStatus("SCHEDULED");
+                LOGGER.info("Scheduling task {} for workflow run {}", taskRun.getTaskName(), workflowRunSaved.getId());
+                kafkaTemplate.send("tasks.execute", workflowRunSaved.getId().toString(), taskExecutionEvent);
+                taskRunRepository.save(taskRun);
             }
         }
     }
