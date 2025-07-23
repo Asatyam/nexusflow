@@ -1,6 +1,7 @@
 package io.nexusflow.workflowmanager.service;
 
 import io.nexusflow.eventschemas.TaskExecutionEvent;
+import io.nexusflow.workflowmanager.domain.TaskNode;
 import io.nexusflow.workflowmanager.domain.WorkflowGraph;
 import io.nexusflow.workflowmanager.entity.TaskRun;
 import io.nexusflow.workflowmanager.entity.WorkflowDefinition;
@@ -8,15 +9,21 @@ import io.nexusflow.workflowmanager.entity.WorkflowRun;
 import io.nexusflow.workflowmanager.repositories.TaskRunRepository;
 import io.nexusflow.workflowmanager.repositories.WorkflowDefinitionRepository;
 import io.nexusflow.workflowmanager.repositories.WorkflowRunRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class WorkflowService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowService.class);
     private final WorkflowDefinitionRepository workflowDefinitionRepository;
     private final WorkflowRunRepository workflowRunRepository;
     private final TaskRunRepository taskRunRepository;
@@ -44,32 +51,55 @@ public class WorkflowService {
         workflowDefinition.setEnabled(true);
         return workflowDefinitionRepository.save(workflowDefinition);
     }
+    
+    private WorkflowRun saveStartingTaskRuns(WorkflowRun workflowRun, WorkflowGraph graph) {
 
+        for (TaskNode node : graph.getStartingNodes()) {
+            TaskRun taskRun = new TaskRun();
+            taskRun.setWorkflowRun(workflowRun);
+            taskRun.setTaskName(node.getName());
+            taskRun.setStatus("PENDING");
+            workflowRun.getTaskRuns().add(taskRun);
+        }
+        return workflowRunRepository.save(workflowRun);
+    }
+
+    private void runAndSchedulePendingTasks(WorkflowRun workflowRunSaved) {
+
+        for (TaskRun taskRun : workflowRunSaved.getTaskRuns()) {
+            if(taskRun.getStatus().equals("PENDING")) {
+                TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent();
+                taskExecutionEvent.setTaskRunId(taskRun.getId());
+                taskExecutionEvent.setWorkflowRunId(workflowRunSaved.getId());
+                taskExecutionEvent.setTaskName(taskRun.getTaskName());
+                kafkaTemplate.send("tasks.execute", workflowRunSaved.getId().toString(), taskExecutionEvent);
+                taskRun.setStatus("SCHEDULED");
+            }
+        }
+    }
+
+
+    @Transactional
     public WorkflowRun runWorkflow(Long WorkflowDefinitionId) {
         WorkflowDefinition workflowDefinition = workflowDefinitionRepository.findById(WorkflowDefinitionId)
                 .orElseThrow(() -> new RuntimeException("WorkflowDefinition not found"));
 
         WorkflowGraph workflowGraph = workflowDefinitionParser.buildWorkflowGraph(workflowDefinition);
-        System.out.println("Workflow Graph: " + workflowGraph);
+        LOGGER.debug("Workflow Graph: {}", workflowGraph);
 
         WorkflowRun workflowRun = new WorkflowRun();
         workflowRun.setWorkflowDefinition(workflowDefinition);
         workflowRun.setStatus("RUNNING");
         workflowRun.setStartTime(LocalDateTime.now());
-        WorkflowRun workflowRunSaved = workflowRunRepository.save(workflowRun);
 
-        TaskRun taskRun = new TaskRun();
-        taskRun.setWorkflowRun(workflowRunSaved);
-        //TODO: Parse task name from workflow definition
-        taskRun.setTaskName("initial-task");
-        taskRun.setStatus("PENDING");
-        taskRun.setStartTime(LocalDateTime.now());
-
-        TaskRun taskRunSaved = taskRunRepository.save(taskRun);
-        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskRunSaved.getId(),workflowRunSaved.getId(), taskRunSaved.getTaskName() );
-        kafkaTemplate.send("tasks.execute", workflowRunSaved.getId().toString(), taskExecutionEvent);
+        workflowRun.setTaskRuns(new ArrayList<>());
+        
+        WorkflowRun workflowRunSaved = saveStartingTaskRuns(workflowRun, workflowGraph);
+        runAndSchedulePendingTasks(workflowRunSaved);
 
         return workflowRunSaved;
     }
+
+
 
 }
