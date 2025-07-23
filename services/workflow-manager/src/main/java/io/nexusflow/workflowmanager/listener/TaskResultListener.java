@@ -18,13 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class TaskResultListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskResultListener.class);
+
     private final WorkflowRunRepository workflowRunRepository;
     private final TaskRunRepository taskRunRepository;
     private final WorkflowDefinitionParser workflowDefinitionParser;
