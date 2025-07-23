@@ -34,7 +34,7 @@
 
 [ ] Enhance Core Workflow Logic
 
-[ ] Implement DAG (Directed Acyclic Graph) parsing from the WorkflowDefinition's JSON to handle multi-step workflows with complex dependencies.
+[x] Implement DAG (Directed Acyclic Graph) parsing from the WorkflowDefinition's JSON to handle multi-step workflows with complex dependencies.
 
 [ ] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
 
