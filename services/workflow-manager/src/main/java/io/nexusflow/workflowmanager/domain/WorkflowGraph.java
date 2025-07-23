@@ -1,30 +1,53 @@
 package io.nexusflow.workflowmanager.domain;
 
 import java.util.List;
+import java.util.Map;
 
 public class WorkflowGraph {
 
-    private List<TaskNode> tasks;
+    private Map<String, TaskNode> taskNodeMap;
+    private Map<String, List<String>> graph;
+    private List<TaskNode> startingNodes;
+
+    public WorkflowGraph(Map<String, TaskNode> taskNodeMap, Map<String, List<String>> graph, List<TaskNode> startingNodes) {
+        this.taskNodeMap = taskNodeMap;
+        this.graph = graph;
+        this.startingNodes = startingNodes;
+    }
 
     public WorkflowGraph() {
     }
 
-    public WorkflowGraph(List<TaskNode> taskNodes) {
-        this.tasks = taskNodes;
+    public Map<String, TaskNode> getTaskNodeMap() {
+        return taskNodeMap;
     }
 
-    public List<TaskNode> getTasks() {
-        return tasks;
+    public void setTaskNodeMap(Map<String, TaskNode> taskNodeMap) {
+        this.taskNodeMap = taskNodeMap;
     }
 
-    public void setTasks(List<TaskNode> tasks) {
-        this.tasks = tasks;
+    public Map<String, List<String>> getGraph() {
+        return graph;
+    }
+
+    public void setGraph(Map<String, List<String>> graph) {
+        this.graph = graph;
+    }
+
+    public List<TaskNode> getStartingNodes() {
+        return startingNodes;
+    }
+
+    public void setStartingNodes(List<TaskNode> startingNodes) {
+        this.startingNodes = startingNodes;
     }
 
     @Override
     public String toString() {
         return "WorkflowGraph{" +
-                "tasks=" + tasks +
+                "taskNodeMap=" + taskNodeMap +
+                ", graph=" + graph +
+                ", startingNodes=" + startingNodes +
                 '}';
     }
 }

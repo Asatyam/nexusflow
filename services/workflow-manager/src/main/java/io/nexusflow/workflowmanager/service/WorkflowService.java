@@ -1,6 +1,5 @@
 package io.nexusflow.workflowmanager.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nexusflow.eventschemas.TaskExecutionEvent;
 import io.nexusflow.workflowmanager.domain.WorkflowGraph;
 import io.nexusflow.workflowmanager.entity.TaskRun;
@@ -22,28 +21,19 @@ public class WorkflowService {
     private final WorkflowRunRepository workflowRunRepository;
     private final TaskRunRepository taskRunRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final WorkflowDefinitionParser workflowDefinitionParser;
 
 
     @Autowired
-    public WorkflowService(WorkflowDefinitionRepository workflowDefinitionRepository, WorkflowRunRepository workflowRunRepository, TaskRunRepository taskRunRepository, KafkaTemplate<String, Object> kafkaTemplate) {
+    public WorkflowService(WorkflowDefinitionRepository workflowDefinitionRepository, WorkflowRunRepository workflowRunRepository, TaskRunRepository taskRunRepository, KafkaTemplate<String, Object> kafkaTemplate, WorkflowDefinitionParser workflowDefinitionParser) {
         this.workflowDefinitionRepository = workflowDefinitionRepository;
         this.workflowRunRepository = workflowRunRepository;
         this.taskRunRepository = taskRunRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.workflowDefinitionParser = workflowDefinitionParser;
     }
 
-    public WorkflowGraph parseWorkflowDefinition(WorkflowDefinition workflowDefinition) {
 
-        WorkflowGraph workflowGraph = new WorkflowGraph();
-        String definition = workflowDefinition.getDefinition();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            workflowGraph = objectMapper.readValue(definition, WorkflowGraph.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing workflow definition: " + e.getMessage());
-        }
-        return workflowGraph;
-    }
 
     public WorkflowDefinition createWorkflow(String name,String description, String definition) {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
@@ -59,7 +49,7 @@ public class WorkflowService {
         WorkflowDefinition workflowDefinition = workflowDefinitionRepository.findById(WorkflowDefinitionId)
                 .orElseThrow(() -> new RuntimeException("WorkflowDefinition not found"));
 
-        WorkflowGraph workflowGraph = parseWorkflowDefinition(workflowDefinition);
+        WorkflowGraph workflowGraph = workflowDefinitionParser.buildWorkflowGraph(workflowDefinition);
         System.out.println("Workflow Graph: " + workflowGraph);
 
         WorkflowRun workflowRun = new WorkflowRun();
