@@ -1,7 +1,9 @@
 package io.nexusflow.workflowmanager.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.nexusflow.workflowmanager.enums.TaskRunStatusEnum;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +16,7 @@ public class TaskRun {
 
     @ManyToOne
     @JoinColumn(name = "workflow_run_id", nullable = false)
+    @JsonBackReference
     private WorkflowRun workflowRun;
 
     private String taskName;
@@ -22,6 +25,7 @@ public class TaskRun {
     private String logsUrl;
     private String artifactUrl;
 
+    @CreationTimestamp
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

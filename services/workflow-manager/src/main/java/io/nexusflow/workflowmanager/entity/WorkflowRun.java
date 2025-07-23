@@ -1,7 +1,9 @@
 package io.nexusflow.workflowmanager.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.nexusflow.workflowmanager.enums.WorkflowRunStatusEnum;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,10 +22,12 @@ public class WorkflowRun {
     private String inputData;
     private String outputData;
 
+    @CreationTimestamp
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
     @OneToMany(mappedBy = "workflowRun", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<TaskRun> taskRuns;
 
     public WorkflowRun() {
