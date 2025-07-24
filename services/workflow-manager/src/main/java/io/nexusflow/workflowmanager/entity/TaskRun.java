@@ -26,6 +26,7 @@ public class TaskRun {
     private String artifactUrl;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

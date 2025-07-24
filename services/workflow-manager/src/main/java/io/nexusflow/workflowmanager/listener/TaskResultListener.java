@@ -117,6 +117,7 @@ public class TaskResultListener {
             WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
             workflowRun.setStatus("FAILED");
             workflowRun.setEndTime(LocalDateTime.now());
+            LOGGER.info("The WorkflowRun {} has failed due to task failure of {}", workflowRun.getId(), completedTaskRun.getTaskName());
         } else if (event.getStatus().equals("COMPLETED") || event.getStatus().equals("SUCCESS")) {
             LOGGER.info("Task {} completed successfully", completedTaskRun.getTaskName());
             completedTaskRun.setStatus("COMPLETED");
