@@ -5,5 +5,5 @@ import io.nexusflow.eventschemas.TaskExecutionEvent;
 
 public interface TaskHandler {
     String getTaskName();
-    TaskCompletionEvent execute(TaskExecutionEvent event);
+    TaskCompletionEvent execute(TaskExecutionEvent event) throws Exception;
 }
