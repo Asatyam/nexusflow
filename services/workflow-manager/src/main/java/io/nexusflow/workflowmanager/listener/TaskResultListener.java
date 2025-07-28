@@ -4,6 +4,7 @@ import io.nexusflow.eventschemas.TaskCompletionEvent;
 import io.nexusflow.eventschemas.TaskExecutionEvent;
 import io.nexusflow.workflowmanager.domain.WorkflowGraph;
 import io.nexusflow.workflowmanager.entity.TaskRun;
+import io.nexusflow.workflowmanager.entity.WorkflowDefinition;
 import io.nexusflow.workflowmanager.entity.WorkflowRun;
 import io.nexusflow.workflowmanager.repositories.TaskRunRepository;
 import io.nexusflow.workflowmanager.repositories.WorkflowRunRepository;
@@ -102,6 +103,15 @@ public class TaskResultListener {
         }
     }
 
+    public void retryTaskExecution(TaskRun taskRun) {
+        LOGGER.info("Retrying task execution for task {} with ID: {}, #: {}", taskRun.getTaskName(), taskRun.getId(), taskRun.getRetries() + 1);
+        taskRun.setRetries(taskRun.getRetries() + 1);
+        taskRun.setStatus("SCHEDULED");
+        sendTaskExecutionEvent(taskRun);
+    }
+    
+    
+
     @Transactional
     @KafkaListener(topics = "tasks.results")
     public void listenForTaskResults(TaskCompletionEvent event) {
@@ -112,30 +122,40 @@ public class TaskResultListener {
 
         if (event.getStatus().equals("FAILURE")) {
             LOGGER.error("Task {} failed with message: {}", completedTaskRun.getTaskName(), event.getMessage());
-            completedTaskRun.setStatus("FAILED");
-            completedTaskRun.setEndTime(LocalDateTime.now());
-            WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
-            workflowRun.setStatus("FAILED");
-            workflowRun.setEndTime(LocalDateTime.now());
-            LOGGER.info("The WorkflowRun {} has failed due to task failure of {}", workflowRun.getId(), completedTaskRun.getTaskName());
+            WorkflowDefinition workflowDefinition = completedTaskRun.getWorkflowRun().getWorkflowDefinition();
+            if ( workflowDefinition.getMaxRetries() > completedTaskRun.getRetries()) {
+                retryTaskExecution(completedTaskRun);
+            }else {
+                markWorkflowRunAsFailed(completedTaskRun);
+            }
         } else if (event.getStatus().equals("COMPLETED") || event.getStatus().equals("SUCCESS")) {
-            LOGGER.info("Task {} completed successfully", completedTaskRun.getTaskName());
-            completedTaskRun.setStatus("COMPLETED");
-            completedTaskRun.setLogsUrl(event.getLogsUrl());
-            completedTaskRun.setArtifactUrl(event.getArtifactUrl());
-            completedTaskRun.setEndTime(LocalDateTime.now());
-
             LOGGER.info("RECEIVED THE MESSAGE: {}", event.getMessage());
-
+            markTaskRunAsCompleted(event, completedTaskRun);
 
             WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
             //TODO: Optimize using Cache
             WorkflowGraph workflowGraph = workflowDefinitionParser.buildWorkflowGraph(workflowRun.getWorkflowDefinition());
             scheduleNextTasks(completedTaskRun, workflowRun, workflowGraph);
-
             checkForWorkflowCompletion(workflowRun, workflowGraph);
         } else {
             LOGGER.warn("Received task completion event with unknown status: {}", event.getStatus());
         }
+    }
+
+    private void markTaskRunAsCompleted(TaskCompletionEvent event, TaskRun completedTaskRun) {
+        LOGGER.info("Task {} completed successfully", completedTaskRun.getTaskName());
+        completedTaskRun.setStatus("COMPLETED");
+        completedTaskRun.setLogsUrl(event.getLogsUrl());
+        completedTaskRun.setArtifactUrl(event.getArtifactUrl());
+        completedTaskRun.setEndTime(LocalDateTime.now());
+    }
+
+    private  void markWorkflowRunAsFailed(TaskRun completedTaskRun) {
+        completedTaskRun.setStatus("FAILED");
+        completedTaskRun.setEndTime(LocalDateTime.now());
+        WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
+        workflowRun.setStatus("FAILED");
+        workflowRun.setEndTime(LocalDateTime.now());
+        LOGGER.info("The WorkflowRun {} has failed due to task failure of {}", workflowRun.getId(), completedTaskRun.getTaskName());
     }
 }

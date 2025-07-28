@@ -34,11 +34,11 @@
 
 [x] Implement DAG (Directed Acyclic Graph) parsing from the WorkflowDefinition's JSON to handle multi-step workflows with complex dependencies.
 
-[ ] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
+[x] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
 
 [ ] Build System Resilience & Features
 
-[ ] Implement robust error handling and automated retry policies for failed tasks.
+[x] Implement robust error handling and automated retry policies for failed tasks.
 
 [ ] Fully integrate MinIO for storing and retrieving task logs and output artifacts.
 
