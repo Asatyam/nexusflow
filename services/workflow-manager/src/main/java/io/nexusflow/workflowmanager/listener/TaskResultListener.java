@@ -18,13 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class TaskResultListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskResultListener.class);
+
     private final WorkflowRunRepository workflowRunRepository;
     private final TaskRunRepository taskRunRepository;
     private final WorkflowDefinitionParser workflowDefinitionParser;
@@ -110,21 +110,32 @@ public class TaskResultListener {
         TaskRun completedTaskRun = taskRunRepository.findById(event.getTaskRunId())
                 .orElseThrow(()->new RuntimeException("TaskRun not found for ID: " + event.getTaskRunId()));
 
-        completedTaskRun.setStatus(event.getStatus());
-        completedTaskRun.setLogsUrl(event.getLogsUrl());
-        completedTaskRun.setArtifactUrl(event.getArtifactUrl());
-        completedTaskRun.setEndTime(LocalDateTime.now());
+        if (event.getStatus().equals("FAILURE")) {
+            LOGGER.error("Task {} failed with message: {}", completedTaskRun.getTaskName(), event.getMessage());
+            completedTaskRun.setStatus("FAILED");
+            completedTaskRun.setEndTime(LocalDateTime.now());
+            WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
+            workflowRun.setStatus("FAILED");
+            workflowRun.setEndTime(LocalDateTime.now());
+            LOGGER.info("The WorkflowRun {} has failed due to task failure of {}", workflowRun.getId(), completedTaskRun.getTaskName());
+        } else if (event.getStatus().equals("COMPLETED") || event.getStatus().equals("SUCCESS")) {
+            LOGGER.info("Task {} completed successfully", completedTaskRun.getTaskName());
+            completedTaskRun.setStatus("COMPLETED");
+            completedTaskRun.setLogsUrl(event.getLogsUrl());
+            completedTaskRun.setArtifactUrl(event.getArtifactUrl());
+            completedTaskRun.setEndTime(LocalDateTime.now());
 
-        LOGGER.info("RECEIVED THE MESSAGE: {}", event.getMessage());
+            LOGGER.info("RECEIVED THE MESSAGE: {}", event.getMessage());
 
 
-        WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
-        //TODO: Optimize using Cache
-        WorkflowGraph workflowGraph = workflowDefinitionParser.buildWorkflowGraph(workflowRun.getWorkflowDefinition());
-        scheduleNextTasks(completedTaskRun, workflowRun, workflowGraph);
+            WorkflowRun workflowRun = completedTaskRun.getWorkflowRun();
+            //TODO: Optimize using Cache
+            WorkflowGraph workflowGraph = workflowDefinitionParser.buildWorkflowGraph(workflowRun.getWorkflowDefinition());
+            scheduleNextTasks(completedTaskRun, workflowRun, workflowGraph);
 
-        checkForWorkflowCompletion(workflowRun, workflowGraph);
-
-
+            checkForWorkflowCompletion(workflowRun, workflowGraph);
+        } else {
+            LOGGER.warn("Received task completion event with unknown status: {}", event.getStatus());
+        }
     }
 }
