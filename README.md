@@ -41,15 +41,11 @@
 
 [x] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
 
-[ ] Build System Resilience & Features
+[x] Build System Resilience & Features
 
 [x] Implement robust error handling and automated retry policies for failed tasks.
 
 [x] Fully integrate MinIO for storing and retrieving task logs and output artifacts.
-
-[ ] Implement a log-capturing utility that intercepts System.out and System.err, redirects the output to an in-memory stream, and uploads the captured content to MinIO.
-
-[ ] Implement compensation logic (Sagas) for workflows that fail midway, allowing for clean rollbacks.
 
 [ ] Add API Gateway & Security
 
@@ -74,3 +70,9 @@
 [ ] Create Kubernetes manifests (Deployments, Services, etc.) to deploy the entire application stack.
 
 [ ] Set up a CI/CD pipeline (e.g., using GitHub Actions) to automate the building of Docker images and deployment to Kubernetes.
+
+## Future Enhancements
+
+[ ] Implement a log-capturing utility that intercepts System.out and System.err, redirects the output to an in-memory stream, and uploads the captured content to MinIO.
+
+[ ] Implement compensation logic (Sagas) for workflows that fail midway, allowing for clean rollbacks.
