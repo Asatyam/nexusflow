@@ -18,6 +18,7 @@ public class WorkflowDefinition {
     private String name;
     private String description;
     private Integer version;
+    private Integer maxRetries;
 
     @Column(columnDefinition = "TEXT")
     private String definition;
@@ -109,6 +110,15 @@ public class WorkflowDefinition {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", isEnabled=" + isEnabled +
+                ", maxRetries=" + maxRetries +
                 '}';
+    }
+
+    public Integer getMaxRetries() {
+        return maxRetries;
+    }
+
+    public void setMaxRetries(Integer maxRetries) {
+        this.maxRetries = maxRetries;
     }
 }

@@ -4,6 +4,11 @@
 - `mvn install`
 - `docker-compose up -d`
 - Update postgres username and password
+- Set the environment variables in your IDE or terminal:
+  - `NEXUSFLOW_MINIO_ROOT_USER=yourminiousername`
+  - `NEXUSFLOW_MINIO_ROOT_PASSWORD=yourminiosecurepassword`
+  This must be same as the one in the `docker-compose.yml` file for MinIO.
+
 
 
 ## TODO
@@ -34,13 +39,15 @@
 
 [x] Implement DAG (Directed Acyclic Graph) parsing from the WorkflowDefinition's JSON to handle multi-step workflows with complex dependencies.
 
-[ ] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
+[x] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
 
 [ ] Build System Resilience & Features
 
-[ ] Implement robust error handling and automated retry policies for failed tasks.
+[x] Implement robust error handling and automated retry policies for failed tasks.
 
-[ ] Fully integrate MinIO for storing and retrieving task logs and output artifacts.
+[x] Fully integrate MinIO for storing and retrieving task logs and output artifacts.
+
+[ ] Implement a log-capturing utility that intercepts System.out and System.err, redirects the output to an in-memory stream, and uploads the captured content to MinIO.
 
 [ ] Implement compensation logic (Sagas) for workflows that fail midway, allowing for clean rollbacks.
 

@@ -40,14 +40,17 @@ public class WorkflowService {
         this.workflowDefinitionParser = workflowDefinitionParser;
     }
 
+    public Iterable<WorkflowDefinition> getAllWorkflows() {
+        return workflowDefinitionRepository.findAll();
+    }
 
-
-    public WorkflowDefinition createWorkflow(String name,String description, String definition) {
+    public WorkflowDefinition createWorkflow(String name,String description, String definition, Integer maxRetries) {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setName(name);
         workflowDefinition.setDefinition(definition);
         workflowDefinition.setDescription(description);
         workflowDefinition.setVersion(1);
+        workflowDefinition.setMaxRetries(maxRetries);
         workflowDefinition.setEnabled(true);
 
         workflowDefinitionParser.detectCycle(workflowDefinition);

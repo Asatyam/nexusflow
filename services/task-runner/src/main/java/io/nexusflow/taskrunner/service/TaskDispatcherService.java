@@ -5,7 +5,6 @@ import io.nexusflow.eventschemas.TaskExecutionEvent;
 import io.nexusflow.taskrunner.handler.TaskHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class TaskDispatcherService {
         LOGGER.info("Executing task: {}...", event.getTaskName());
 
         TaskHandler taskHandler = taskHandlers.get(event.getTaskName());
-        TaskCompletionEvent taskCompletionEvent;
 
         if (taskHandler == null) {
             LOGGER.error("No handler found for task: {}", event.getTaskName());

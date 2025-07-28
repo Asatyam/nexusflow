@@ -1,7 +1,6 @@
 package io.nexusflow.workflowmanager.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import io.nexusflow.workflowmanager.enums.TaskRunStatusEnum;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -21,9 +20,10 @@ public class TaskRun {
 
     private String taskName;
     private String status;
-    private Integer retries;
+    private Integer retries=0;
     private String logsUrl;
     private String artifactUrl;
+
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -16,12 +16,18 @@ public class WorkflowController {
         this.workflowService = workflowService;
     }
 
+    @GetMapping
+    public Iterable<WorkflowDefinition> getAllWorkflows() {
+        return workflowService.getAllWorkflows();
+    }
+
     @PostMapping
     public WorkflowDefinition createWorkflow(@RequestBody WorkflowDefinition workflowDefinition) {
         return workflowService.createWorkflow(
                 workflowDefinition.getName(),
                 workflowDefinition.getDescription(),
-                workflowDefinition.getDefinition()
+                workflowDefinition.getDefinition(),
+                workflowDefinition.getMaxRetries()
         );
     }
 
