@@ -54,7 +54,40 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  workflow-manager:
+    build:
+      context: .
+      dockerfile: services/workflow-manager/Dockerfile
+    container_name: nexusflow_workflow_manager
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexusflow_db
+      NEXUSFLOW_POSTGRES_USER: ${NEXUSFLOW_POSTGRES_USER}
+      NEXUSFLOW_POSTGRES_PASSWORD: ${NEXUSFLOW_POSTGRES_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
 
+    depends_on:
+      - postgres
+      - kafka
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.workflow-manager.rule=PathPrefix(`/api/workflows`)"
+      - "traefik.http.services.workflow-manager.loadbalancer.server.port=8080"
+
+  task-runner:
+    build:
+      context: .
+      dockerfile: services/task-runner/Dockerfile
+    container_name: nexusflow_task_runner
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: ${NEXUSFLOW_MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${NEXUSFLOW_MINIO_ROOT_PASSWORD}
+
+    depends_on:
+        - kafka
+        - minio
 volumes:
     postgres_data:
     minio_data:

@@ -5,5 +5,5 @@ RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /app/services/workflow-manager/target/*.jar app.jar
+COPY --from=build /app/services/task-runner/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
