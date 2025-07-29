@@ -47,11 +47,18 @@
 
 [x] Fully integrate MinIO for storing and retrieving task logs and output artifacts.
 
-[ ] Add API Gateway & Security
+[x] Add API Gateway & Security
 
-[ ] Introduce an API Gateway (Traefik) to act as a single entry point for all API calls.
+[x] Introduce an API Gateway (Traefik) to act as a single entry point for all API calls.
 
-[ ] Secure the API endpoints with an authentication/authorization mechanism like JWT or OAuth2.
+[x] Secure the API endpoints with an authentication/authorization mechanism like JWT or OAuth2.
+
+[x] Write optimized Dockerfiles for all the services.
+
+[x] Containerize & Prepare for Deployment
+
+
+## Future Enhancements
 
 [ ] Implement Full Observability
 
@@ -63,15 +70,9 @@
 
 [ ] Create a comprehensive Grafana dashboard to visualize all metrics, logs, and traces in one place.
 
-[ ] Containerize & Prepare for Deployment
-
-[ ] Write optimized Dockerfiles for the workflow-manager and task-runner Java applications.
-
 [ ] Create Kubernetes manifests (Deployments, Services, etc.) to deploy the entire application stack.
 
 [ ] Set up a CI/CD pipeline (e.g., using GitHub Actions) to automate the building of Docker images and deployment to Kubernetes.
-
-## Future Enhancements
 
 [ ] Implement a log-capturing utility that intercepts System.out and System.err, redirects the output to an in-memory stream, and uploads the captured content to MinIO.
 
