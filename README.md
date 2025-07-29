@@ -49,7 +49,7 @@
 
 [ ] Add API Gateway & Security
 
-[ ] Introduce an API Gateway (e.g., Traefik, Spring Cloud Gateway) to act as a single entry point for all API calls.
+[ ] Introduce an API Gateway (Traefik) to act as a single entry point for all API calls.
 
 [ ] Secure the API endpoints with an authentication/authorization mechanism like JWT or OAuth2.
 

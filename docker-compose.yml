@@ -44,6 +44,17 @@ services:
         MINIO_ROOT_PASSWORD: ${NEXUSFLOW_MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
+  traefik:
+    image: traefik:v3.5.0
+    container_name: nexusflow_traefik
+    command: --api.insecure=true --providers.docker=true
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+
 volumes:
     postgres_data:
     minio_data:
