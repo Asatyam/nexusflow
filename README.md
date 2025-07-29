@@ -76,3 +76,8 @@
 [ ] Implement a log-capturing utility that intercepts System.out and System.err, redirects the output to an in-memory stream, and uploads the captured content to MinIO.
 
 [ ] Implement compensation logic (Sagas) for workflows that fail midway, allowing for clean rollbacks.
+
+[ ] Implement a user-friendly web interface for managing workflows, monitoring runs, and visualizing task dependencies.
+
+[ ] Consider implementing a plugin system to allow users to define custom task types or integrations with third-party services.
+
