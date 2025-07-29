@@ -63,6 +63,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexusflow_db
       NEXUSFLOW_POSTGRES_USER: ${NEXUSFLOW_POSTGRES_USER}
       NEXUSFLOW_POSTGRES_PASSWORD: ${NEXUSFLOW_POSTGRES_PASSWORD}
+      NEXUSFLOW_JWT_SECRET: ${NEXUSFLOW_JWT_SECRET}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
 
     depends_on:
@@ -86,8 +87,29 @@ services:
       MINIO_SECRET_KEY: ${NEXUSFLOW_MINIO_ROOT_PASSWORD}
 
     depends_on:
-        - kafka
-        - minio
+      - kafka
+      - minio
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: nexusflow_auth_service
+    environment:
+      NEXUSFLOW_JWT_SECRET: ${NEXUSFLOW_JWT_SECRET}
+      NEXUSFLOW_JWT_EXPIRATION_MS: ${NEXUSFLOW_JWT_EXPIRATION_MS}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexusflow_db
+      NEXUSFLOW_POSTGRES_USER: ${NEXUSFLOW_POSTGRES_USER}
+      NEXUSFLOW_POSTGRES_PASSWORD: ${NEXUSFLOW_POSTGRES_PASSWORD}
+
+    depends_on:
+      - postgres
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-service.rule=PathPrefix(`/api/auth/`)"
+      - "traefik.http.services.auth-service.loadbalancer.server.port=8080"
+
 volumes:
     postgres_data:
     minio_data:

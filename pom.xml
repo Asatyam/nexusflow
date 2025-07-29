@@ -21,6 +21,7 @@
     <modules>
         <module>services/workflow-manager</module>
         <module>services/task-runner</module>
+        <module>services/auth-service</module>
         <module>libs/event-schemas</module>
     </modules>
 </project>
