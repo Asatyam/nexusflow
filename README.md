@@ -1,84 +1,131 @@
-# Nexusflow
+# NexusFlow: A Decentralized Workflow Orchestrator
 
-## Run
-- `mvn install`
-- `docker-compose up -d`
-- Update postgres username and password
-- Set the environment variables in your IDE or terminal:
-  - `NEXUSFLOW_MINIO_ROOT_USER=yourminiousername`
-  - `NEXUSFLOW_MINIO_ROOT_PASSWORD=yourminiosecurepassword`
-  This must be same as the one in the `docker-compose.yml` file for MinIO.
+NexusFlow is a powerful backend platform designed to run, manage, and monitor complex, multi-step automated processes. Built on a modern microservice architecture, it allows developers to define a workflow as a series of connected steps (a graph), and the system will automatically execute each step in the correct order, handle failures with automated retries, and report on the progress in real-time.
 
+It serves as a lightweight, event-driven alternative to enterprise tools like Apache Airflow or AWS Step Functions, making it ideal for applications requiring high resilience and scalability.
 
+-----
 
-## TODO
+## ✨ Features
 
-[x] Project Foundation & Setup
+* **Event-Driven Microservice Architecture:** Core components (`auth-service`, `workflow-manager`, `task-runner`) are fully decoupled, communicating asynchronously via Apache Kafka for maximum resilience.
+* **Complex Workflow Management:** Supports defining and executing multi-step workflows with complex dependencies using a Directed Acyclic Graph (DAG) model, including cycle detection to prevent invalid workflows.
+* **Dynamic Task Execution:** A generic `task-runner` service can execute different types of jobs based on the workflow definition, allowing for a flexible and extensible system.
+* **Robust Error Handling & Retries:** Automatically retries failed tasks a configurable number of times before marking a workflow as failed, ensuring high reliability.
+* **Secure API:** A dedicated authentication service issues JWTs, and a Traefik API Gateway protects all endpoints, ensuring only authorized users can access the system.
+* **Containerized Environment:** The entire multi-service application stack (including PostgreSQL, Kafka, and MinIO) is containerized with Docker for consistent and portable deployments.
+* **Artifact & Log Storage:** Fully integrates with MinIO object storage to save and retrieve detailed task logs and any output files ("artifacts").
 
-[x] Defined overall system architecture (Event-Driven Microservices).
+-----
 
-[x] Selected the core technology stack (Java/Spring Boot, Kafka, PostgreSQL).
+## 🏗️ Architecture
 
-[x] Set up the Git repository with a multi-module Maven structure (services, libs).
+The system is composed of several independent microservices that work together:
 
-[x] Established a local development environment using Docker Compose for backing services (Postgres, Kafka).
+* **API Gateway (Traefik):** The single entry point for all external traffic, routing requests to the appropriate service.
+* **Auth Service:** Manages user registration and login, issuing JWTs for authentication.
+* **Workflow Manager:** The "brain" of the system. It defines workflows, tracks the state of each run, and orchestrates the overall process by publishing events.
+* **Task Runner:** A stateless worker that listens for task execution events, performs the business logic, and reports the result.
+* **Backing Services:** The platform relies on Kafka for event streaming, PostgreSQL for state persistence, and MinIO for object storage.
 
-[x] Core Backend Implementation
+-----
 
-[x] Defined and created the primary database models (JPA Entities for WorkflowDefinition, WorkflowRun, TaskRun).
+## 🚀 How to Run
 
-[x] Implemented the data access layer (Spring Data JPA Repositories).
+### Prerequisites
 
-[x] Created the shared event-schemas library to define Kafka message contracts.
+* [Docker](https://www.docker.com/get-started) and Docker Compose
+* [Apache Maven](https://maven.apache.org/download.cgi)
+* Java 17 or higher
 
-[x] Built the initial API and Service layers for the workflow-manager.
+### 1\. Set Up Environment Variables
 
-[x] Implemented a basic Kafka producer in the workflow-manager and a consumer in the task-runner.
+Create a `.env` file in the project's root directory. This file stores all your secret credentials.
 
-[x] Successfully established the first end-to-end workflow loop (API call -> manager publishes event -> runner consumes event).
+> ```env
+> # PostgreSQL Credentials
+> NEXUSFLOW_POSTGRES_USER=your_postgres_user
+> NEXUSFLOW_POSTGRES_PASSWORD=your_postgres_password
+> 
+>  #  MinIO Credentials
+> NEXUSFLOW\_MINIO\_ROOT\_USER=your\_minio\_user
+> NEXUSFLOW\_MINIO\_ROOT\_PASSWORD=your\_minio\_password
+> 
+> # JWT Settings
+> NEXUSFLOW\_JWT\_SECRET=your\_super\_long\_and\_secure\_base64\_encoded\_secret\_key
+> NEXUSFLOW\_JWT\_EXPIRATION\_MS=86400000
+> ```
 
-[x] Implement DAG (Directed Acyclic Graph) parsing from the WorkflowDefinition's JSON to handle multi-step workflows with complex dependencies.
+### 2\. Build and Run the Application
 
-[x] Enhance the task-runner to dynamically execute different types of tasks based on the event payload, rather than a single hardcoded action.
+From the root directory of the project, run the following commands in your terminal:
 
-[x] Build System Resilience & Features
+```bash
+# First, build the Java applications using Maven
+mvn clean install
 
-[x] Implement robust error handling and automated retry policies for failed tasks.
+# Then, start all services using Docker Compose.
+# The --build flag ensures images are rebuilt if you've made changes.
+docker-compose up --build
+```
 
-[x] Fully integrate MinIO for storing and retrieving task logs and output artifacts.
+The application will be accessible through the Traefik API Gateway at `http://localhost:80`. You can view the Traefik dashboard at `http://localhost:8080`.
 
-[x] Add API Gateway & Security
+### Troubleshooting
 
-[x] Introduce an API Gateway (Traefik) to act as a single entry point for all API calls.
+**Environment Variable Issues in IDE:** If you run the services directly from your IDE and encounter errors related to missing environment variables, it's because the IDE's run configuration doesn't automatically see the root .env file. To fix this, you must manually add the required environment variables to the Run Configuration for each service (auth-service, workflow-manager, task-runner) within your IDE.
 
-[x] Secure the API endpoints with an authentication/authorization mechanism like JWT or OAuth2.
+-----
 
-[x] Write optimized Dockerfiles for all the services.
+## 🛠️ How to Use It
 
-[x] Containerize & Prepare for Deployment
+### API Endpoints
 
+All endpoints are accessed through the API Gateway at `http://localhost:80`.
 
-## Future Enhancements
+#### Authentication (`/api/auth`)
 
-[ ] Implement Full Observability
+* **`POST /api/auth/register`**: Creates a new user account.
+  * **Body:** `{ "username": "user", "password": "password" }`
+* **`POST /api/auth/login`**: Authenticates a user and returns a JWT.
+  * **Body:** `{ "username": "user", "password": "password" }`
+  * **Response:** `{ "token": "your_jwt_here" }`
 
-[ ] Instrument all services with Prometheus to collect and expose key metrics (e.g., workflow duration, task failure rate).
+#### Workflows (`/api/workflows`)
 
-[ ] Set up Loki and Promtail to aggregate logs from all services into a centralized, searchable system.
+*Requires a valid JWT in the `Authorization: Bearer <token>` header.*
 
-[ ] Implement distributed tracing (e.g., with OpenTelemetry and Jaeger/Tempo) to visualize the entire lifecycle of a request across multiple services.
+* **`POST /api/workflows`**: Creates a new workflow definition.
+  * **Body:** A JSON object representing the workflow (see sample below).
+* **`POST /api/workflows/{id}/run`**: Triggers a new run of a specific workflow.
 
-[ ] Create a comprehensive Grafana dashboard to visualize all metrics, logs, and traces in one place.
+### Sample Workflow Definition
 
-[ ] Create Kubernetes manifests (Deployments, Services, etc.) to deploy the entire application stack.
+This example defines a three-step video processing pipeline where the final step depends on two parallel tasks completing first.
 
-[ ] Set up a CI/CD pipeline (e.g., using GitHub Actions) to automate the building of Docker images and deployment to Kubernetes.
+```json
+{
+  "name": "Video Processing Pipeline",
+  "version": 1,
+  "description": "Transcodes a video into multiple resolutions and generates thumbnails.",
+  "maxRetries": 3,
+  "definition": "{\"tasks\":[{\"name\":\"upload-video\",\"dependsOn\":[]},{\"name\":\"transcode-1080p\",\"dependsOn\":[\"upload-video\"]},{\"name\":\"transcode-480p\",\"dependsOn\":[\"upload-video\"]},{\"name\":\"package-for-streaming\",\"dependsOn\":[\"transcode-1080p\",\"transcode-480p\"]}]}"
+}
+```
 
-[ ] Implement a log-capturing utility that intercepts System.out and System.err, redirects the output to an in-memory stream, and uploads the captured content to MinIO.
+-----
 
-[ ] Implement compensation logic (Sagas) for workflows that fail midway, allowing for clean rollbacks.
+## 🔧 Future Enhancements
 
-[ ] Implement a user-friendly web interface for managing workflows, monitoring runs, and visualizing task dependencies.
-
-[ ] Consider implementing a plugin system to allow users to define custom task types or integrations with third-party services.
-
+* [ ] **Implement Full Observability:**
+  * [ ] Instrument services with **Prometheus** for metrics collection.
+  * [ ] Set up **Loki** for centralized log aggregation.
+  * [ ] Implement distributed tracing with **Jaeger/Tempo**.
+  * [ ] Create a comprehensive **Grafana dashboard** to visualize all metrics, logs, and traces.
+* [ ] **Deploy to Kubernetes:**
+  * [ ] Create Kubernetes manifests (Deployments, Services, etc.) for the entire application stack.
+  * [ ] Set up a CI/CD pipeline (e.g., using GitHub Actions) to automate builds and deployments.
+* [ ] **Advanced Features:**
+  * [ ] Implement a real log-capturing utility to stream task `stdout`/`stderr` to MinIO.
+  * [ ] Implement compensation logic (**Sagas**) for workflows that fail midway, allowing for clean rollbacks.
+  * [ ] Develop a user-friendly web interface for managing and monitoring workflows.
