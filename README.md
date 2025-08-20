@@ -97,7 +97,7 @@ All endpoints are accessed through the API Gateway at `http://localhost:80`.
 
 * **`POST /api/workflows`**: Creates a new workflow definition.
   * **Body:** A JSON object representing the workflow (see sample below).
-* **`POST /api/workflows/{id}/run`**: Triggers a new run of a specific workflow.
+* **`POST /api/workflows/run/{id}`**: Triggers a new run of a specific workflow.
 
 ### Sample Workflow Definition
 
