@@ -113,6 +113,19 @@ This example defines a three-step video processing pipeline where the final step
 }
 ```
 
+### Adding Custom Tasks
+The task-runner service uses a dynamic dispatcher to execute tasks. This means that only tasks with a corresponding handler defined in the task-runner will run. The name of the task in the workflow definition must match the name returned by the getTaskName() method in a handler.
+
+If you need to add a new custom task:
+
+1. Clone the repository.
+
+2. In the task-runner service, create a new Java class in the handler package that implements the TaskHandler interface.
+
+3. Implement the getTaskName() and execute() methods with your custom logic.
+
+4. Re-build the Docker images (docker-compose up --build). Your new task is now available to be used in workflow definitions.
+
 -----
 
 ## 🔧 Future Enhancements
